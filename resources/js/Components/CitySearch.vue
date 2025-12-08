@@ -1,9 +1,9 @@
 <script setup>
 import { ref, onMounted } from "vue";
-import algoliasearch from "algoliasearch/lite";
 import { autocomplete } from "@algolia/autocomplete-js";
 import "@algolia/autocomplete-theme-classic";
 import axios from "axios";
+import * as algoliasearch from "algoliasearch/lite";
 
 const selected = ref(null);
 
