@@ -20,6 +20,7 @@
     },
     "dependencies": {
         "@algolia/autocomplete-js": "^1.19.4",
+        "@algolia/autocomplete-theme-classic": "^1.19.4",
         "@vitejs/plugin-vue": "^6.0.2",
         "algoliasearch": "^5.46.0",
         "vue": "^3.5.25"
