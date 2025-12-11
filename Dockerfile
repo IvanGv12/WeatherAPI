@@ -34,6 +34,7 @@ RUN php artisan route:clear || true
 RUN php artisan config:cache || true
 RUN php artisan route:cache || true
 RUN php artisan view:cache || true
+RUN php artisan config:clear && php artisan optimize
 
 # 8. Expose Port
 EXPOSE 80
