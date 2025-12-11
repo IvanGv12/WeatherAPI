@@ -12,6 +12,7 @@ WORKDIR /var/www/html
 COPY composer.json composer.lock ./
 
 # 4. Install Dependencies
+# 🔄 COMENTARIO AÑADIDO PARA FORZAR REBUILD (11/12/2025) 🔄
 # Instalamos las dependencias. Esto es CRÍTICO que suceda ANTES de cualquier comando 'php artisan'.
 RUN composer install --no-dev --optimize-autoloader --prefer-dist
 
@@ -27,7 +28,6 @@ ENV WEBROOT=/var/www/html/public
 # 7. Laravel Setup Commands
 # Ejecutamos comandos de optimización y permisos.
 # Nota: La mayoría de los comandos 'artisan' fallarán si la APP_KEY o las credenciales DB están mal, por eso añadimos '|| true'.
-# Railway es muy eficiente al gestionar el caché de configuración, por lo que muchos de estos 'clear'/'cache' son opcionales.
 
 # 7.1. Permisos recomendados para Laravel
 RUN chown -R www-data:www-data storage bootstrap/cache
