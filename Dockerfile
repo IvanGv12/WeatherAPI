@@ -8,20 +8,21 @@ RUN apt-get update && apt-get install -y \
 # Instalar Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-# Crear carpeta de aplicación
+# Crear carpeta de la aplicación
 WORKDIR /var/www/html
 
-# Copiar archivos
+# Copiar archivos del proyecto
 COPY . .
 
 # Instalar dependencias de Laravel
 RUN composer install --no-dev --optimize-autoloader --prefer-dist
 
-# Permisos
-RUN chown -R www-data:www-data storage bootstrap/cache
+# Permisos para Laravel
+RUN chmod -R 775 storage bootstrap/cache \
+    && chown -R www-data:www-data storage bootstrap/cache
 
 # Exponer puerto
 EXPOSE 8080
 
-# Arrancar servidor embebido de Laravel (funciona en Railway)
+# Comando para arrancar Laravel
 CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8080"]
