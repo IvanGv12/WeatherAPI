@@ -34,6 +34,7 @@ $response = $kernel->handle(
     $request = Request::capture()
 );
 
-$response->send();
+// ¡¡ELIMINA ESTA LÍNEA!!
+// $response->send();   ← QUITA ESTO
 
 $kernel->terminate($request, $response);
