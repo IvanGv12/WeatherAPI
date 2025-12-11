@@ -1,26 +1,27 @@
-# Imagen base recomendada para Laravel en Railway
-FROM dunglas/frankenphp:1.2
+FROM php:8.2-fpm
 
-WORKDIR /app
+# Instalar dependencias del sistema
+RUN apt-get update && apt-get install -y \
+    git unzip libzip-dev libpng-dev libonig-dev libxml2-dev \
+    && docker-php-ext-install zip pdo pdo_mysql
 
-# Copiar archivos de composer primero para generar cache
-COPY composer.json composer.lock ./
+# Instalar Composer
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-RUN composer install --no-dev --optimize-autoloader --prefer-dist
+# Crear carpeta de aplicación
+WORKDIR /var/www/html
 
-# Copiar el resto del proyecto
+# Copiar archivos
 COPY . .
 
-# Asegurar permisos
-RUN chmod -R 775 storage bootstrap/cache
+# Instalar dependencias de Laravel
+RUN composer install --no-dev --optimize-autoloader --prefer-dist
 
-# Optimizar laravel
-RUN php artisan config:cache
-RUN php artisan route:cache
-RUN php artisan view:cache
+# Permisos
+RUN chown -R www-data:www-data storage bootstrap/cache
 
-# Exponer puerto 8080 (FrankenPHP usa este por defecto)
+# Exponer puerto
 EXPOSE 8080
 
-# Ejecutar Laravel con FrankenPHP
+# Arrancar servidor embebido de Laravel (funciona en Railway)
 CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8080"]
