@@ -1,16 +1,22 @@
-FROM php:8.2-fpm
+FROM webdevops/php-nginx:8.2
 
-RUN apt-get update && apt-get install -y \
-    git curl libpng-dev libonig-dev libxml2-dev zip unzip
+# Directorio de trabajo
+WORKDIR /app
 
-RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
-
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
-
-WORKDIR /var/www
-
+# Copiamos el proyecto
 COPY . .
 
+# Copiamos Composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+# Instalamos dependencias de Laravel
 RUN composer install --optimize-autoloader --no-dev --prefer-dist
 
-RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
+# Ajustamos permisos necesarios
+RUN chown -R application:application /app/storage /app/bootstrap/cache
+
+# Importante: indicamos dónde está el index.php
+ENV WEB_DOCUMENT_ROOT=/app/public
+
+# Railway usa puerto 8080
+EXPOSE 8080
