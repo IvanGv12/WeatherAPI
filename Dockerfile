@@ -1,15 +1,33 @@
-FROM webdevops/php-nginx:8.2
+FROM richarvey/nginx-php-fpm:latest
 
-WORKDIR /app
+# Directorio base
+WORKDIR /var/www/html
 
+# Copiar el proyecto completo
 COPY . .
 
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+# Configurar Laravel para que Nginx sirva el public/
+ENV DOCUMENT_ROOT=/var/www/html/public
+ENV WEBROOT=/var/www/html/public
 
-RUN composer install --no-dev --optimize-autoloader
+# Instalar dependencias de Composer (solo producción)
+RUN composer install --no-dev --optimize-autoloader --prefer-dist
 
-RUN chmod -R 775 storage bootstrap/cache
+# Generar storage link
+RUN php artisan storage:link || true
 
-ENV WEB_DOCUMENT_ROOT=/app/public
+# Optimizar Laravel
+RUN php artisan config:clear || true
+RUN php artisan cache:clear || true
+RUN php artisan view:clear || true
+RUN php artisan route:clear || true
 
-EXPOSE 8080
+RUN php artisan config:cache || true
+RUN php artisan route:cache || true
+RUN php artisan view:cache || true
+
+# Permisos recomendados para Laravel
+RUN chown -R www-data:www-data storage bootstrap/cache
+
+# Puerto detectado por Railway
+EXPOSE 80
