@@ -12,6 +12,12 @@ RUN composer install --no-dev --optimize-autoloader --prefer-dist
 # Permisos necesarios
 RUN chmod -R 777 storage bootstrap/cache
 
+ENV DOCUMENT_ROOT=/var/www/html/public
+ENV WEBROOT=/var/www/html/public
+
+RUN sed -i 's|root /var/www/html;|root /var/www/html/public;|g' /etc/nginx/sites-enabled/default.conf
+
+
 # Exponer el puerto esperado por Railway
 EXPOSE 8080
 
