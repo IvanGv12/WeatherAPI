@@ -1,40 +1,23 @@
 <?php
 
-use Illuminate\Contracts\Http\Kernel;
+use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
 
 define('LARAVEL_START', microtime(true));
 
-/*
-|--------------------------------------------------------------------------
-| Check If Application Is Under Maintenance
-|--------------------------------------------------------------------------
-*/
-if (file_exists($maintenance = __DIR__.'/../storage/framework/maintenance.php')) {
+// Maintenance mode
+if (file_exists($maintenance = __DIR__.'/storage/framework/maintenance.php')) {
     require $maintenance;
 }
 
-/*
-|--------------------------------------------------------------------------
-| Register The Auto Loader
-|--------------------------------------------------------------------------
-*/
+// Composer autoload
 require __DIR__.'/../vendor/autoload.php';
 
-/*
-|--------------------------------------------------------------------------
-| Run The Application
-|--------------------------------------------------------------------------
-*/
+// Bootstrap
 $app = require_once __DIR__.'/../bootstrap/app.php';
 
-$kernel = $app->make(Kernel::class);
-
-$response = $kernel->handle(
-    $request = Request::capture()
-);
-
-// ¡¡ELIMINA ESTA LÍNEA!!
-// $response->send();   ← QUITA ESTO
-
-$kernel->terminate($request, $response);
+// Handle request
+$app->handleRequest(
+    Request::capture()
+)->send();
+ 
