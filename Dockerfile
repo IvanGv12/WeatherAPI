@@ -1,25 +1,26 @@
-FROM dunglas/frankenphp:1.1-php8.2
+# Imagen base recomendada para Laravel en Railway
+FROM dunglas/frankenphp:1.2
 
-# Laravel debe vivir en /app para Railway
 WORKDIR /app
 
-# Copiamos TODO el proyecto
-COPY . .
+# Copiar archivos de composer primero para generar cache
+COPY composer.json composer.lock ./
 
-# Instalamos dependencias Laravel
 RUN composer install --no-dev --optimize-autoloader --prefer-dist
 
-# Permisos necesarios
-RUN chmod -R 777 storage bootstrap/cache
+# Copiar el resto del proyecto
+COPY . .
 
-ENV DOCUMENT_ROOT=/var/www/html/public
-ENV WEBROOT=/var/www/html/public
+# Asegurar permisos
+RUN chmod -R 775 storage bootstrap/cache
 
-RUN sed -i 's|root /var/www/html;|root /var/www/html/public;|g' /etc/nginx/sites-enabled/default.conf
+# Optimizar laravel
+RUN php artisan config:cache
+RUN php artisan route:cache
+RUN php artisan view:cache
 
-
-# Exponer el puerto esperado por Railway
+# Exponer puerto 8080 (FrankenPHP usa este por defecto)
 EXPOSE 8080
 
-# Ejecutar frankenphp con el Caddyfile del proyecto
-CMD ["frankenphp", "run", "--config", "/app/Caddyfile"]
+# Ejecutar Laravel con FrankenPHP
+CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8080"]
